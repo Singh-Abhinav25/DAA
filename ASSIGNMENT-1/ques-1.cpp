@@ -1,221 +1,61 @@
-// menu driven program to perform various operations on a singly linked list
-
 #include <iostream>
 using namespace std;
 
-class Node {
-public:
-    int data;
-    Node* next;
-};
-Node* head = nullptr;
-Node* tail = nullptr;
-int size = 0;
+void merge(int arr[], int l, int mid, int r)
+{
+    int n1 = mid - l + 1;
+    int n2 = r - mid;
 
-void insertAtBeginning(int value) {
-    Node* newNode = new Node();
-    newNode->data = value;
-    newNode->next = head;
-    head = newNode;
-    if (tail == nullptr) {
-        tail = newNode;
+    int L[n1], R[n2];
+
+    // Copy data
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = l;
+
+    // Merge the two arrays
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = R[j++];
     }
-    ::size++;
-    cout << "Inserted " << value << " at the beginning." << endl;
+
+    // Copy remaining elements
+    while (i < n1)
+        arr[k++] = L[i++];
+
+    while (j < n2)
+        arr[k++] = R[j++];
 }
 
-void insertAtEnd(int value) {
-    Node* newNode = new Node();
-    newNode->data = value;
-    newNode->next = nullptr;
-    if (tail != nullptr) {
-        tail->next = newNode;
+void mergeSort(int arr[], int l, int r)
+{
+    if (l < r)
+    {
+        int mid = l + (r - l) / 2;
+
+        mergeSort(arr, l, mid);
+        mergeSort(arr, mid + 1, r);
+
+        merge(arr, l, mid, r);
     }
-    tail = newNode;
-    if (head == nullptr) {
-        head = newNode;
-    }
-    ::size++;
-    cout << "Inserted " << value << " at the end." << endl;
 }
 
-void insertInBetween(int value, int position) {
-    if (position < 1 || position > ::size + 1) {
-        cout << "Invalid position." << endl;
-        return;
-    }
-    if (position == 1) {
-        insertAtBeginning(value);
-        return;
-    }
-    if (position == ::size + 1) {
-        insertAtEnd(value);
-        return;
-    }
-    Node* newNode = new Node();
-    newNode->data = value;
-    Node* temp = head;
-    for (int i = 1; i < position - 1; i++) {
-        temp = temp->next;
-    }
-    newNode->next = temp->next;
-    temp->next = newNode;
-    ::size++;
-    cout << "Inserted " << value << " at position " << position << "." << endl;
-}
+int main()
+{
+    int arr[] = {38, 27, 43, 3, 9, 82, 10};
+    int n = sizeof(arr) / sizeof(arr[0]);
 
-void deleteFromBeginning() {
-    if (head == nullptr) {
-        cout << "List is empty. Cannot delete." << endl;
-        return;
-    }
-    Node* temp = head;
-    head = head->next;
-    if (head == nullptr) {
-        tail = nullptr;
-    }
-    cout << "Deleted " << temp->data << " from the beginning." << endl;
-    delete temp;
-    ::size--;
-}
+    mergeSort(arr, 0, n - 1);
 
-void deleteFromEnd() {
-    if (head == nullptr) {
-        cout << "List is empty. Cannot delete." << endl;
-        return;
-    }
-    if (head->next == nullptr) {
-        cout << "Deleted " << head->data << " from the end." << endl;
-        delete head;
-        head = nullptr;
-        tail = nullptr;
-    } else {
-        Node* temp = head;
-        while (temp->next != tail) {
-            temp = temp->next;
-        }
-        cout << "Deleted " << tail->data << " from the end." << endl;
-        delete tail;
-        tail = temp;
-        tail->next = nullptr;
-    }
-    ::size--;
-}
+    cout << "Sorted array:\n";
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
 
-void deleteAtNode(int position) {
-    if (position < 1 || position > ::size) {
-        cout << "Invalid position." << endl;
-        return;
-    }
-    if (position == 1) {
-        deleteFromBeginning();
-        return;
-    }
-    if (position == ::size) {
-        deleteFromEnd();
-        return;
-    }
-    Node* temp = head;
-    for (int i = 1; i < position - 1; i++) {
-        temp = temp->next;
-    }
-    Node* nodeToDelete = temp->next;
-    temp->next = nodeToDelete->next;
-    cout << "Deleted " << nodeToDelete->data << " from position " << position << "." << endl;
-    delete nodeToDelete;
-    ::size--;
-}
-
-void searchNode(int value) {
-    Node* temp = head;
-    int position = 1;
-    while (temp != nullptr) {
-        if (temp->data == value) {
-            cout << "Value " << value << " found at position " << position << "." << endl;
-            return;
-        }
-        temp = temp->next;
-        position++;
-    }
-    cout << "Value " << value << " not found in the list." << endl;
-}
-
-void displayList() {
-    if (head == nullptr) {
-        cout << "List is empty." << endl;
-        return;
-    }
-    Node* temp = head;
-    cout << "List elements: ";
-    while (temp != nullptr) {
-        cout << temp->data << " ";
-        temp = temp->next;
-    }
-    cout << endl;
-}
-
-void displaySize() {
-    cout << "Size of the list: " << ::size << endl;
-}
-
-int main() {
-    int choice, value;
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Insert at Beginning\n";
-        cout << "2. Insert at End\n";
-        cout << "3. Insertion in between\n";
-        cout << "4. Delete from beginning \n";
-        cout << "5. Delete from last \n";
-        cout << "6. Deletion at node\n";
-        cout << "7. Search Node and display its position from head\n";
-        cout << "8. Display all nodes\n";
-        cout << "9. Quit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
-        switch (choice) {
-            case 1:
-                cout << "Enter value to insert at beginning: ";
-                cin >> value;
-                insertAtBeginning(value);
-                break;
-            case 2:
-                cout << "Enter value to insert at end: ";
-                cin >> value;
-                insertAtEnd(value);
-                break;
-            case 3:
-                int position;
-                cout << "Enter value to insert: ";
-                cin >> value;
-                cout << "Enter position to insert at: ";
-                cin >> position;
-                insertInBetween(value, position);
-                break;
-            case 4:
-                deleteFromBeginning();
-                break;
-            case 5:
-                deleteFromEnd();
-                break;
-            case 6:
-                cout << "Enter position to delete from: ";
-                cin >> position;
-                deleteAtNode(position);
-                break;
-            case 7:
-                cout << "Enter value to search: ";
-                cin >> value;
-                searchNode(value);
-                break;
-            case 8:
-                displayList();
-                break;
-            case 9:
-                cout << "Exiting program." << endl;
-                break;
-            default:
-                cout << "Invalid choice. Please try again." << endl;
-}        } while (choice != 9);
     return 0;
 }
